@@ -1,6 +1,6 @@
 comm_mode       = linear
 integrator      = md
-nsteps          = 100000
+nsteps          = 50000000
 dt              = 0.001
 nstxout         = 5000
 nstvout         = 5000
@@ -19,16 +19,16 @@ constraints     = h-bonds
 pbc             = xyz
 periodic-molecules = yes 	; periodic betacristobalite
 
-; Freeze groups
-freezegrps = bot top
-freezedim = Y Y Y N Y N
-
 tcoupl          = v-rescale
 tc_grps         = System
 ref_t           = 298.15
 tau_t           = 1.0
 
 pcoupl          = no
+
+; Freeze groups
+freezegrps = bot top
+freezedim = Y Y N N Y Y
 
 ; Pull info
 pull                  = yes
@@ -37,8 +37,9 @@ pull-ncoords          = 2
 pull-group1-name      = bot
 pull-group2-name      = top
 
-pull-print-com2       = yes
-pull-print-ref-value  = yes
+;pull-print-com1       = yes
+;pull-print-com2       = yes
+;pull-print-ref-value  = yes
 pull-print-components = yes
 
 pull-coord1-type      = constant-force
@@ -49,6 +50,6 @@ pull-coord1-k         = 10000  ; shear force
 
 pull-coord2-type      = constant-force
 pull-coord2-geometry  = direction-periodic
-pull-coord2-vec       = 0.0 0.0 1.0 ; normal force vector
-pull-coord2-groups    = 1 2
+pull-coord2-vec       = 0.0 0.0 -1.0 ; normal force vector
+pull-coord2-groups    = 2 1
 pull-coord2-k         = 10000  ; normal force
