@@ -1,3 +1,4 @@
+import itertools as it
 import time
 import os
 import shutil
@@ -12,9 +13,15 @@ import mbuild as mb
 import metamds as mds
 
 
-def build_monolayer(chain_length, n_molecules, **kwargs):
+def build_monolayer(chain_length, n_molecules, pattern_class, **kwargs):
     from mbuild.examples import AlkaneMonolayer
-    pattern = mb.Random2DPattern(n_molecules)
+    if pattern_class is mb.Random2DPattern:
+        pattern = pattern_class(n_molecules)
+        pattern_name = 'rand'
+    if pattern_class is mb.Grid2DPattern:
+        pattern = pattern_class(int(np.sqrt(n_molecules)), int(np.sqrt(n_molecules)))
+        pattern_name = 'grid'
+
     bot = AlkaneMonolayer(pattern, tile_x=1, tile_y=1, chain_length=chain_length)
     mb.translate(bot, [0, 0, 2])
 
@@ -33,7 +40,7 @@ def build_monolayer(chain_length, n_molecules, **kwargs):
     mb.translate(top, [0, 0, top_of_bot - bot_of_top + 0.5])
 
     monolayer = mb.Compound([bot, top])
-    monolayer.name = 'alkane_n-{}_l-{}'.format(n_molecules, chain_length)
+    monolayer.name = 'alkane_n-{}_l-{}-{}'.format(n_molecules, chain_length, pattern_name)
     rigid_groups = {'bot': bot_rigid,
                     'top': top_rigid}
     return monolayer, rigid_groups
@@ -44,7 +51,7 @@ def create_run_script(build_func, forcefield, input_dir, **kwargs):
     name = compound.name
     em = os.path.join(input_dir, 'em.mdp')
     nvt = os.path.join(input_dir, 'nvt.mdp')
-    shear = os.path.join(input_dir, 'shear.mdp')
+    shear = os.path.join(input_dir, 'const_vel.mdp')
     gro = '{name}.gro'.format(name=name)
     top = '{name}.top'.format(name=name)
     ndx = '{name}.ndx'.format(name=name)
@@ -65,7 +72,7 @@ def create_run_script(build_func, forcefield, input_dir, **kwargs):
             f.write('\n')
 
     cmds = list()
-    cmds.append('gmx grompp -f {mdp} -c {gro} -p {top} -n {ndx} -o em.tpr'.format( mdp=em, gro=gro, top=top, ndx=ndx))
+    cmds.append('gmx grompp -f {mdp} -c {gro} -p {top} -n {ndx} -o em.tpr'.format(mdp=em, gro=gro, top=top, ndx=ndx))
     cmds.append('gmx mdrun -v -deffnm em -ntmpi 1')
 
     cmds.append('gmx grompp -f {mdp} -c em.gro -p {top} -n {ndx} -o nvt.tpr'.format(mdp=nvt, top=top, ndx=ndx))
@@ -86,11 +93,16 @@ if __name__ == '__main__':
         pass
     sim = mds.Simulation(name='monolayer', template=create_run_script, output_dir='output')
 
-    chain_lengths = [2]
-    for length in chain_lengths:
-        parameters = {'chain_length': 2,
-                      'n_molecules': 100,
+    chain_lengths = [6, 9, 12, 15, 18, 21]
+    n_molecules = [100, 81, 64]
+    patterns = [mb.Random2DPattern, mb.Grid2DPattern]
+    for length, n_mols, pattern in it.product(chain_lengths, n_molecules, patterns):
+        if n_mols == 100 and pattern is mb.Grid2DPattern:
+            continue
+        parameters = {'chain_length': length,
+                      'n_molecules': n_mols,
                       'forcefield': 'OPLS-aa',
+                      'pattern_class': pattern,
                       'build_func': build_monolayer}
 
         # Parameterize our simulation template
