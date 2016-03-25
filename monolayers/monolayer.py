@@ -93,9 +93,13 @@ if __name__ == '__main__':
         pass
     sim = mds.Simulation(name='monolayer', template=create_run_script, output_dir='output')
 
-    chain_lengths = [6, 9, 12, 15, 18, 21]
-    n_molecules = [100, 81, 64]
-    patterns = [mb.Random2DPattern, mb.Grid2DPattern]
+    # chain_lengths = [6, 9, 12, 15, 18, 21]
+    # n_molecules = [100, 81, 64]
+    # patterns = [mb.Random2DPattern, mb.Grid2DPattern]
+
+    chain_lengths = [6, 21]
+    n_molecules = [100]
+    patterns = [mb.Random2DPattern]
     for length, n_mols, pattern in it.product(chain_lengths, n_molecules, patterns):
         if n_mols == 100 and pattern is mb.Grid2DPattern:
             continue
