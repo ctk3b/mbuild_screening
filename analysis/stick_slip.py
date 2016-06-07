@@ -12,8 +12,6 @@ from scipy import signal
 sns.set_style('whitegrid')
 
 base_path = '../output/task_0'
-n_chains_per_surface = 100
-
 traj = md.load(os.path.join(base_path, 'shear.xtc'),
                top=os.path.join(base_path, 'nvt.gro'))
 
@@ -38,7 +36,7 @@ x -= n_hops * box_x
 # plt.xlabel('time (ps)')
 # plt.ylabel('x position (nm)')
 
-slope, intercept, r, p, std_err  = linregress(t, x)
+slope, intercept, r, p, std_err = linregress(t, x)
 
 x -= (slope * t + intercept)
 

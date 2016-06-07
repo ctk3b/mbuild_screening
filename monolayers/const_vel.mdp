@@ -1,13 +1,13 @@
 comm_mode          = linear
 integrator         = md
-nsteps             = 50000000
+nsteps             = 25000000
 dt                 = 0.002
 nstxout            = 5000
 nstvout            = 5000
-nstfout            = 0
-nstlog             = 500
-nstenergy          = 500
-nstxout-compressed = 500
+nstfout            = 5000
+nstlog             = 5000
+nstenergy          = 5000
+nstxout-compressed = 5000
 
 nstlist         = 10
 ns_type         = grid
@@ -51,4 +51,4 @@ pull-coord2-type      = constant-force
 pull-coord2-geometry  = direction-periodic
 pull-coord2-vec       = 0.0 0.0 -1.0 ; normal force vector
 pull-coord2-groups    = 2 1
-pull-coord2-k         = 10000  ; normal force
+pull-coord2-k         = 15000  ; normal force

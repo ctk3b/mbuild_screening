@@ -1,20 +1,57 @@
+from glob import glob
 import os
+import pickle
+
+import matplotlib.pyplot as plt
+import mdtraj as md
 import MDAnalysis as mda
 import numpy as np
+import seaborn as sns
 
-base_path = "/Users/summeraz/Documents/Mixed_Monolayers/Pure_Alkane/H18"
+sns.set_style('whitegrid')
 
-trr = mda.coordinates.TRR.TRRReader(os.path.join(base_path, 'const_vel.trr'))
+folders = glob('../monolayers/output/task_*')
+forces = dict()
 
-fric = []
+for base_path in folders:
+    name = next(x for x in os.listdir(base_path)
+                if x.startswith('alkane_') and x.endswith('.gro'))
 
-skip = 500 # skip first 500ps
+    name = os.path.splitext(name)[0]
+    info = name.split('_')
 
-for frame in trr:
-    if frame.time > 500:
-        top_forces = frame.forces[:int(frame.n_atoms/2)]
-        fric.append(np.sum(top_forces[:,0]))
+    try:
+        trr = mda.coordinates.TRR.TRRReader(os.path.join(base_path, 'shear.trr'))
+    except IOError:
+        continue
 
-nf = 1000.0 #kJ/mol/angstom
-cof = np.mean(fric)/1000.0
-print cof
+    # dt = traj.time[1] - traj.time[0]
+    # toss = 1000/dt  # 1 ns
+    # traj = traj[toss:]
+
+    fric = []
+    toss = 1000 # skip first 1ns
+    for frame in trr:
+        if frame.time > toss:
+            top_forces = frame.forces[:int(frame.n_atoms/2)]
+            fric.append(np.sum(top_forces[:, 0]))
+        last_time = frame.time
+
+    normal_force = 10000.0 #kJ/mol/angstom
+    cof = np.mean(fric) / normal_force
+
+    plt.plot(np.linspace(1000.0, last_time, len(fric)) / 1000, fric)
+    #plt.ylim(0, 1)
+    plt.xlabel('time (ns)')
+    plt.ylabel('Shear force (kJ/(mol nm)')
+
+    plt.savefig('{}_shear_force.png'.format(name), bbox_inches='tight')
+    plt.clf()
+
+    forces[name] = np.asarray(fric)
+    print(name, last_time)
+    del trr
+
+with open('forces.pickle', 'wb') as fh:
+    pickle.dump(forces, fh)
+

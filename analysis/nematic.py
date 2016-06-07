@@ -9,7 +9,7 @@ import seaborn as sns
 
 sns.set_style('whitegrid')
 
-folders = glob('../output/task_*')
+folders = glob('../100ns_forces/task_*')
 S2 = dict()
 
 for base_path in folders:
@@ -23,19 +23,16 @@ for base_path in folders:
     n_chains_per_surface = int(info[1][2:])
     hydrogens_per_surface = 100 - n_chains_per_surface
 
-    traj = md.load(os.path.join(base_path, 'shear_whole.xtc'),
-                   top=os.path.join(base_path, 'nvt.gro'))
+    try:
+        traj = md.load(os.path.join(base_path, 'shear_whole.xtc'),
+                       top=os.path.join(base_path, 'nvt.gro'))
+    except FileNotFoundError:
+        continue
 
     dt = traj.time[1] - traj.time[0]
     toss = 1000/dt  # 1 ns
     traj = traj[toss:]
 
-    if traj.n_frames < 10000:
-        S2[name]['top'] = None
-        S2[name]['top_std'] = None
-        S2[name]['bot'] = None
-        S2[name]['bot_std'] = None
-        continue
     # Nematic order parameter
     atoms_per_chain = (traj.n_atoms // 2 - 1800 - hydrogens_per_surface) // n_chains_per_surface
     bot_chain_indices = [[n+x for x in range(atoms_per_chain)]
@@ -64,7 +61,8 @@ for base_path in folders:
     S2[name]['top_std'] = np.std(top_s2)
     S2[name]['bot'] = np.mean(bot_s2)
     S2[name]['bot_std'] = np.std(bot_s2)
-    print(name)
+    print(name, traj.n_frames)
+    del traj
 
 with open('nematic_order.pickle', 'wb') as fh:
     pickle.dump(S2, fh)

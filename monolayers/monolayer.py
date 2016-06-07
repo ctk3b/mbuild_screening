@@ -13,10 +13,15 @@ import mbuild as mb
 import metamds as mds
 
 
+used_random_patterns = dict()
+
 def build_monolayer(chain_length, n_molecules, pattern_class, **kwargs):
     from mbuild.examples import AlkaneMonolayer
     if pattern_class is mb.Random2DPattern:
-        pattern = pattern_class(n_molecules)
+        if n_molecules in used_random_patterns:
+            pattern = used_random_patterns[n_molecules]
+        else:
+            pattern = pattern_class(n_molecules)
         pattern_name = 'rand'
     if pattern_class is mb.Grid2DPattern:
         pattern = pattern_class(int(np.sqrt(n_molecules)), int(np.sqrt(n_molecules)))
@@ -93,12 +98,12 @@ if __name__ == '__main__':
         pass
     sim = mds.Simulation(name='monolayer', template=create_run_script, output_dir='output')
 
-    # chain_lengths = [6, 9, 12, 15, 18, 21]
-    # n_molecules = [100, 81, 64]
+    chain_lengths = [6, 9, 12, 15, 18, 21]
+    n_molecules = [100, 81, 64]
     # patterns = [mb.Random2DPattern, mb.Grid2DPattern]
 
-    chain_lengths = [6, 21]
-    n_molecules = [100]
+    # chain_lengths = [6, 21]
+    # n_molecules = [100]
     patterns = [mb.Random2DPattern]
     for length, n_mols, pattern in it.product(chain_lengths, n_molecules, patterns):
         if n_mols == 100 and pattern is mb.Grid2DPattern:
@@ -122,10 +127,10 @@ if __name__ == '__main__':
     # Pick which one to select?
     import ipdb; ipdb.set_trace()
 
-    trj_path = os.path.join(task.output_dir, 'nvt.xtc')
-    top_path = os.path.join(task.output_dir, 'em.gro')
-    traj = md.load(trj_path, top=top_path)
-    print(traj)
+    # trj_path = os.path.join(task.output_dir, 'nvt.xtc')
+    # top_path = os.path.join(task.output_dir, 'em.gro')
+    # traj = md.load(trj_path, top=top_path)
+    # print(traj)
 
     # RDF
     # pairs = traj.top.select_pairs('name C', 'name C')
