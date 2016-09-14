@@ -1,0 +1,55 @@
+comm_mode          = linear
+integrator         = md
+nsteps             = 25000000
+dt                 = 0.002
+nstxout            = 5000
+nstvout            = 5000
+nstfout            = 5000
+nstlog             = 5000
+nstenergy          = 5000
+nstxout-compressed = 5000
+
+nstlist         = 10
+ns_type         = grid
+rlist           = 1.0
+coulombtype     = pme
+rcoulomb        = 1.0
+rvdw            = 1.0
+constraints     = h-bonds
+lincs-warnangle = 90 ; Ignore surface hydrogens from amorphous Silica
+pbc             = xyz
+periodic-molecules = yes 	; periodic betacristobalite
+
+tcoupl          = v-rescale
+tc_grps         = System
+ref_t           = 298.15
+tau_t           = 1.0
+
+pcoupl          = no
+
+; Freeze groups
+freezegrps = bot top
+freezedim = Y Y N N Y Y
+
+; Pull info
+pull                  = yes
+pull-ngroups          = 2
+pull-ncoords          = 2
+
+pull-group1-name      = bot
+pull-group2-name      = top
+
+pull-print-components  = yes
+
+pull-coord1-type      = umbrella
+pull-coord1-geometry  = direction-periodic
+pull-coord1-vec       = 1.0 0.0 0.0 ; shear force direction vector
+pull-coord1-groups    = 0 2
+pull-coord1-rate      = 0.01 ; nm/ps
+pull-coord1-k         = 100000
+
+pull-coord2-type      = constant-force
+pull-coord2-geometry  = direction-periodic
+pull-coord2-vec       = 0.0 0.0 -1.0 ; normal force vector
+pull-coord2-groups    = 2 1
+pull-coord2-k         = 9000  ; normal force
