@@ -16,5 +16,5 @@ pbc		        = xyz 		; Periodic Boundary Conditions (yes/no)
 periodic-molecules = yes 	; periodic betacristobalite
 
 ; Freeze groups
-freezegrps = bot top
-freezedim = Y Y Y Y Y Y
+; freezegrps = bot top
+; freezedim = Y Y Y Y Y Y

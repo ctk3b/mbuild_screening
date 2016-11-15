@@ -102,8 +102,8 @@ if __name__ == '__main__':
     n_molecules = [100, 81, 64]
     # patterns = [mb.Random2DPattern, mb.Grid2DPattern]
 
-    # chain_lengths = [6, 21]
-    # n_molecules = [100]
+    chain_lengths = [6]
+    n_molecules = [100]
     patterns = [mb.Random2DPattern]
     for length, n_mols, pattern in it.product(chain_lengths, n_molecules, patterns):
         if n_mols == 100 and pattern is mb.Grid2DPattern:

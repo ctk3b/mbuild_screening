@@ -1,13 +1,13 @@
 comm_mode       = linear
 integrator      = md
-nsteps          = 100000
+nsteps          = 2000
 dt              = 0.0005
 nstxout         = 5000
 nstvout         = 5000
 nstfout         = 0
 nstlog          = 100
 nstenergy       = 100
-nstxout-compressed = 500
+nstxout-compressed = 100
 
 nstlist         = 10
 ns_type         = grid
@@ -20,8 +20,8 @@ pbc             = xyz
 periodic-molecules = yes 	; periodic betacristobalite
 
 ; Freeze groups
-freezegrps = bot top
-freezedim = Y Y Y Y Y Y
+; freezegrps = bot top
+; freezedim = Y Y Y Y Y Y
 
 tcoupl          = v-rescale
 tc_grps         = System
